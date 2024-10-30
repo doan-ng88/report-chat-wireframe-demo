@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .summary-card {
+            border-radius: 8px;
+            padding: 20px;
+            color: #fff;
+        }
+        .card-icon {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+        .export-btn {
+            float: right;
+        }
+        .filter-select {
+            max-width: 200px;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .btn-export {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <h2 class="mb-4">Report Dashboard</h2>
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Tổng quan</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="conversations-tab" data-bs-toggle="tab" data-bs-target="#conversations" type="button" role="tab" aria-controls="conversations" aria-selected="false">Hội thoại</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="employees-tab" data-bs-toggle="tab" data-bs-target="#employees" type="button" role="tab" aria-controls="employees" aria-selected="false">Nhân viên</button>
+            </li>
+        </ul>
+        <!-- Tabs Content -->
+        <div class="tab-content" id="dashboardTabsContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <!-- Filter Options -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <select class="form-select filter-select">
+                            <option selected>Tất cả các kênh</option>
+                            <option value="1">Kênh 1</option>
+                            <option value="2">Kênh 2</option>
+                            <option value="3">Kênh 3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select filter-select">
+                            <option selected>Tất cả các cửa hàng</option>
+                            <option value="1">Cửa hàng 1</option>
+                            <option value="2">Cửa hàng 2</option>
+                            <option value="3">Cửa hàng 3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control" placeholder="Date Range">
+                    </div>
+                </div>
+                <!-- Summary Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="summary-card bg-primary">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5>Tin nhắn đến</h5>
+                                    <h3>1,245</h3>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="fas fa-inbox"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="summary-card bg-success">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5>Tin nhắn gửi đi</h5>
+                                    <h3>3,678</h3>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="fas fa-paper-plane"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="summary-card bg-warning">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5>Tin nhắn gửi qua Salework</h5>
+                                    <h3>2,345</h3>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="fab fa-salework"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Hourly Message Chart -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Hourly Message Volume</h5>
+                        <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                </div>
+                <!-- Additional Metrics -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Chi phí quảng cáo (Shopee)</h5>
+                                <p class="card-text">$5,432 <span class="text-success"><i class="fas fa-arrow-up"></i> 5%</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Đánh giá xấu</h5>
+                                <p class="card-text">123 <span class="text-danger"><i class="fas fa-arrow-down"></i> 2%</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Conversations Tab -->
+            <div class="tab-pane fade" id="conversations" role="tabpanel" aria-labelledby="conversations-tab">
+                <!-- Filter Options -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <select class="form-select filter-select">
+                            <option selected>Tất cả các kênh</option>
+                            <option value="1">Kênh 1</option>
+                            <option value="2">Kênh 2</option>
+                            <option value="3">Kênh 3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select filter-select">
+                            <option selected>Tất cả các cửa hàng</option>
+                            <option value="1">Cửa hàng 1</option>
+                            <option value="2">Cửa hàng 2</option>
+                            <option value="3">Cửa hàng 3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control" placeholder="Date Range">
+                    </div>
+                </div>
+                <!-- Pie Charts -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Conversations by Page</h5>
+                                <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="conversationsPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Messages by Page</h5>
+                                <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="messagesPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Customer Message Bar Chart -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Daily Customer Messages</h5>
+                        <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="customerBarChart"></canvas>
+                    </div>
+                </div>
+                <!-- Detailed Statistics Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Detailed Statistics</h5>
+                        <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Number of Conversations</th>
+                                    <th>Messages from Customers</th>
+                                    <th>Replied Messages</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample Data Rows -->
+                                <tr>
+                                    <td>2024-10-01</td>
+                                    <td>150</td>
+                                    <td>300</td>
+                                    <td>280</td>
+                                </tr>
+                                <tr>
+                                    <td>2024-10-02</td>
+                                    <td>180</td>
+                                    <td>350</td>
+                                    <td>330</td>
+                                </tr>
+                                <tr>
+                                    <td>2024-10-03</td>
+                                    <td>200</td>
+                                    <td>400</td>
+                                    <td>390</td>
+                                </tr>
+                                <!-- Add more rows as needed -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Employees Tab -->
+            <div class="tab-pane fade" id="employees" role="tabpanel" aria-labelledby="employees-tab">
+                <!-- Filter Options -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <select class="form-select filter-select">
+                            <option selected>Tất cả các kênh</option>
+                            <option value="1">Kênh 1</option>
+                            <option value="2">Kênh 2</option>
+                            <option value="3">Kênh 3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select filter-select">
+                            <option selected>Tất cả các cửa hàng</option>
+                            <option value="1">Cửa hàng 1</option>
+                            <option value="2">Cửa hàng 2</option>
+                            <option value="3">Cửa hàng 3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control" placeholder="Date Range">
+                    </div>
+                </div>
+                <!-- Employee Conversation Pie Chart -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Employee Conversations</h5>
+                        <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="employeePieChart"></canvas>
+                    </div>
+                </div>
+                <!-- Average Response Time Bar Chart -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Average Response Time</h5>
+                        <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="responseTimeBarChart"></canvas>
+                    </div>
+                </div>
+                <!-- Detailed Employee Statistics Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Employee Statistics</h5>
+                        <button class="btn btn-primary btn-export"><i class="fas fa-download"></i> Xuất dữ liệu</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <select class="form-select filter-select">
+                                <option selected>Tất cả nhân viên</option>
+                                <option value="1">Nhân viên 1</option>
+                                <option value="2">Nhân viên 2</option>
+                                <option value="3">Nhân viên 3</option>
+                            </select>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Number of Sent Messages</th>
+                                        <th>Number of Conversations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Sample Data Rows -->
+                                    <tr>
+                                        <td>2024-10-01</td>
+                                        <td>50</td>
+                                        <td>30</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024-10-02</td>
+                                        <td>60</td>
+                                        <td>35</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024-10-03</td>
+                                        <td>70</td>
+                                        <td>40</td>
+                                    </tr>
+                                    <!-- Add more rows as needed -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js Initialization -->
+    <script>
+        // Overview Hourly Message Chart
+        const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+        const hourlyChart = new Chart(hourlyCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                datasets: [
+                    {
+                        label: 'Tin nhắn đến',
+                        data: Array.from({length: 24}, () => Math.floor(Math.random() * 100)),
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true,
+                    },
+                    {
+                        label: 'Tin nhắn gửi đi',
+                        data: Array.from({length: 24}, () => Math.floor(Math.random() * 100)),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true,
+                    },
+                    {
+                        label: 'Tin nhắn gửi qua Salework',
+                        data: Array.from({length: 24}, () => Math.floor(Math.random() * 100)),
+                        borderColor: '#ffc107',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Hour'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Messages'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Conversations Pie Chart
+        const conversationsPieCtx = document.getElementById('conversationsPieChart').getContext('2d');
+        const conversationsPieChart = new Chart(conversationsPieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Cửa hàng 1', 'Cửa hàng 2', 'Cửa hàng 3'],
+                datasets: [{
+                    data: [300, 50, 100],
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                }
+            }
+        });
+
+        // Messages Pie Chart
+        const messagesPieCtx = document.getElementById('messagesPieChart').getContext('2d');
+        const messagesPieChart = new Chart(messagesPieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Cửa hàng 1', 'Cửa hàng 2', 'Cửa hàng 3'],
+                datasets: [{
+                    data: [500, 200, 300],
+                    backgroundColor: ['#17a2b8', '#dc3545', '#6f42c1'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                }
+            }
+        });
+
+        // Customer Message Bar Chart
+        const customerBarCtx = document.getElementById('customerBarChart').getContext('2d');
+        const customerBarChart = new Chart(customerBarCtx, {
+            type: 'bar',
+            data: {
+                labels: ['2024-10-01', '2024-10-02', '2024-10-03', '2024-10-04', '2024-10-05'],
+                datasets: [{
+                    label: 'Customer Messages',
+                    data: [120, 190, 300, 250, 400],
+                    backgroundColor: '#28a745',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Messages'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Employee Conversations Pie Chart
+        const employeePieCtx = document.getElementById('employeePieChart').getContext('2d');
+        const employeePieChart = new Chart(employeePieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Nhân viên 1', 'Nhân viên 2', 'Nhân viên 3'],
+                datasets: [{
+                    data: [250, 150, 100],
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                }
+            }
+        });
+
+        // Average Response Time Bar Chart
+        const responseTimeBarCtx = document.getElementById('responseTimeBarChart').getContext('2d');
+        const responseTimeBarChart = new Chart(responseTimeBarCtx, {
+            type: 'horizontalBar', // Note: 'horizontalBar' is deprecated in Chart.js v3, use 'bar' with indexAxis
+            data: {
+                labels: ['Nhân viên 1', 'Nhân viên 2', 'Nhân viên 3'],
+                datasets: [{
+                    label: 'Average Response Time (Phút)',
+                    data: [64.01, 45.50, 30.25],
+                    backgroundColor: ['#17a2b8', '#dc3545', '#6f42c1'],
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Minutes'
+                        },
+                        beginAtZero: true
+                    },
+                    y: {
+                        title: {
+                            display: false,
+                            text: 'Employees'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.x + ' Phút';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Initialize Horizontal Bar Chart correctly
+        // Since 'horizontalBar' is deprecated, use 'bar' with indexAxis set to 'y'
+        responseTimeBarChart.config.type = 'bar';
+        responseTimeBarChart.options.indexAxis = 'y';
+        responseTimeBarChart.update();
+    </script>
+</body>
+</html>
